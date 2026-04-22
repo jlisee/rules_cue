@@ -151,8 +151,75 @@ Rule reference
 Rule signatures below use Starlark keyword syntax. Unless marked
 "(required)," attributes are optional.
 
-Common attributes
------------------
+cue_module
+----------
+
+.. code-block:: starlark
+
+   cue_module(name = "cue.mod", file = "module.cue", srcs = [])
+
+Declares a CUE module by pointing at its ``module.cue`` file. The
+convention is to place this target inside the ``cue.mod`` subdirectory of
+the module root and to use the default rule name ``"cue.mod"``.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - Attribute
+     - Description
+   * - ``name``
+     - Target name (defaults to ``"cue.mod"``).
+   * - ``file``
+     - Label of the module's ``module.cue`` file. Must be named exactly
+       ``module.cue`` and sit in a directory named ``cue.mod``
+       (defaults to ``"module.cue"``).
+   * - ``srcs``
+     - CUE files defining external packages from the ``cue.mod``
+       ``gen/``, ``pkg/``, and ``usr/`` directories.
+
+cue_instance
+------------
+
+.. code-block:: starlark
+
+   cue_instance(
+       name,
+       ancestor,            # required: a cue_module or dominating cue_instance
+       srcs,                # required: CUE files for this package
+       deps = [],           # other cue_instance targets this package imports
+       directory_of = None, # override the instance directory designator
+       package_name = "",   # override the package name (defaults to dir basename)
+   )
+
+Declares a CUE instance: a set of files constituting a single CUE
+package within the module identified transitively via ``ancestor``.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 20 80
+
+   * - Attribute
+     - Description
+   * - ``ancestor`` (required)
+     - The containing ``cue_module`` target, or a dominating
+       ``cue_instance`` target. Must provide ``CUEModuleInfo`` or
+       ``CUEInstanceInfo``.
+   * - ``srcs`` (required)
+     - CUE files that are part of this package.
+   * - ``deps``
+     - ``cue_instance`` targets corresponding to this package's import
+       declarations.
+   * - ``directory_of``
+     - Label of a file (or directory) whose containing directory should
+       be used as the instance directory. Defaults to the directory of
+       the first file in ``srcs``.
+   * - ``package_name``
+     - CUE package name for the instance. Defaults to the basename of
+       the instance directory.
+
+Common output rule attributes
+------------------------------
 
 All output-producing rules (``cue_exported_*`` and
 ``cue_consolidated_*``) accept the following attributes in addition to
@@ -264,73 +331,6 @@ Consolidated-output attributes (``cue_consolidated_*``)
    * - ``result``
      - Output file label. Defaults to ``<name>.<ext>`` where the
        extension matches ``output_format``.
-
-cue_module
-----------
-
-.. code-block:: starlark
-
-   cue_module(name = "cue.mod", file = "module.cue", srcs = [])
-
-Declares a CUE module by pointing at its ``module.cue`` file. The
-convention is to place this target inside the ``cue.mod`` subdirectory of
-the module root and to use the default rule name ``"cue.mod"``.
-
-.. list-table::
-   :header-rows: 1
-   :widths: 20 80
-
-   * - Attribute
-     - Description
-   * - ``name``
-     - Target name (defaults to ``"cue.mod"``).
-   * - ``file``
-     - Label of the module's ``module.cue`` file. Must be named exactly
-       ``module.cue`` and sit in a directory named ``cue.mod``
-       (defaults to ``"module.cue"``).
-   * - ``srcs``
-     - CUE files defining external packages from the ``cue.mod``
-       ``gen/``, ``pkg/``, and ``usr/`` directories.
-
-cue_instance
-------------
-
-.. code-block:: starlark
-
-   cue_instance(
-       name,
-       ancestor,            # required: a cue_module or dominating cue_instance
-       srcs,                # required: CUE files for this package
-       deps = [],           # other cue_instance targets this package imports
-       directory_of = None, # override the instance directory designator
-       package_name = "",   # override the package name (defaults to dir basename)
-   )
-
-Declares a CUE instance: a set of files constituting a single CUE
-package within the module identified transitively via ``ancestor``.
-
-.. list-table::
-   :header-rows: 1
-   :widths: 20 80
-
-   * - Attribute
-     - Description
-   * - ``ancestor`` (required)
-     - The containing ``cue_module`` target, or a dominating
-       ``cue_instance`` target. Must provide ``CUEModuleInfo`` or
-       ``CUEInstanceInfo``.
-   * - ``srcs`` (required)
-     - CUE files that are part of this package.
-   * - ``deps``
-     - ``cue_instance`` targets corresponding to this package's import
-       declarations.
-   * - ``directory_of``
-     - Label of a file (or directory) whose containing directory should
-       be used as the instance directory. Defaults to the directory of
-       the first file in ``srcs``.
-   * - ``package_name``
-     - CUE package name for the instance. Defaults to the basename of
-       the instance directory.
 
 cue_exported_standalone_files
 -----------------------------

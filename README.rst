@@ -145,11 +145,13 @@ in the inputs is violated.
 
 -----
 
-Rule reference
-==============
+Rule Reference
+===============
 
-Rule signatures below use Starlark keyword syntax. Unless marked
-"(required)," attributes are optional.
+Rule signatures below use Starlark keyword syntax. Each documented rule
+has its own table. For the six output-producing rules, the per-rule
+tables focus on the usual inputs for that variant; shared attributes are
+documented once in ``Common Attributes Reference`` below.
 
 cue_module
 ----------
@@ -201,6 +203,8 @@ package within the module identified transitively via ``ancestor``.
 
    * - Attribute
      - Description
+   * - ``name``
+     - Target name.
    * - ``ancestor`` (required)
      - The containing ``cue_module`` target, or a dominating
        ``cue_instance`` target. Must provide ``CUEModuleInfo`` or
@@ -218,12 +222,250 @@ package within the module identified transitively via ``ancestor``.
      - CUE package name for the instance. Defaults to the basename of
        the instance directory.
 
-Common output rule attributes
-------------------------------
+cue_exported_standalone_files
+-----------------------------
 
-All output-producing rules (``cue_exported_*`` and
-``cue_consolidated_*``) accept the following attributes in addition to
-their family-specific ones.
+.. code-block:: starlark
+
+   cue_exported_standalone_files(
+       name,
+       srcs = [],
+       qualified_srcs = {},
+       # ... + shared output-producing attributes
+   )
+
+Runs ``cue export`` over a bag of packageless CUE/JSON/YAML/text files.
+No ``cue_module`` is involved.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Attribute
+     - Description
+   * - ``name``
+     - Target name.
+   * - ``srcs``
+     - Usually the main standalone input files to export. In practice
+       you typically set ``srcs``, ``qualified_srcs``, or both.
+   * - ``qualified_srcs``
+     - Additional standalone input files whose type needs an explicit
+       qualifier instead of relying on the file extension.
+
+See ``Common Attributes Reference`` below for shared attrs such as
+``expression``, ``inject``, ``inject_shorthand``,
+``inject_system_variables``, ``concatenate_objects``,
+``merge_other_files``, ``output_package_name``, ``path``,
+``stamping_policy``, ``with_context``, and the exported-family output
+attrs ``output_format``, ``escape``, and ``result``.
+
+cue_exported_files
+------------------
+
+.. code-block:: starlark
+
+   cue_exported_files(
+       name,
+       module,              # required: a cue_module target
+       srcs = [],
+       qualified_srcs = {},
+       deps = [],           # cue_instance targets referenced by srcs
+       # ... + shared output-producing attributes
+   )
+
+Runs ``cue export`` over files that live inside a CUE module but that
+are not themselves an instance. Use it for top-level CUE files that
+import instances from the same module.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Attribute
+     - Description
+   * - ``name``
+     - Target name.
+   * - ``module`` (required)
+     - The ``cue_module`` target for the containing CUE module.
+   * - ``srcs``
+     - Usually the module-relative CUE files (and any extra packageless
+       inputs) that you want to export.
+   * - ``qualified_srcs``
+     - Additional module-relative inputs whose type should be qualified
+       explicitly instead of inferred from the file extension.
+   * - ``deps``
+     - ``cue_instance`` targets referenced by the files in ``srcs``.
+
+See ``Common Attributes Reference`` below for shared attrs such as
+``expression``, ``inject``, ``inject_shorthand``,
+``inject_system_variables``, ``concatenate_objects``,
+``merge_other_files``, ``output_package_name``, ``path``,
+``stamping_policy``, ``with_context``, and the exported-family output
+attrs ``output_format``, ``escape``, and ``result``.
+
+cue_exported_instance
+---------------------
+
+.. code-block:: starlark
+
+   cue_exported_instance(
+       name,
+       instance,            # required: a cue_instance target
+       srcs = [],
+       qualified_srcs = {},
+       # ... + shared output-producing attributes
+   )
+
+Runs ``cue export`` over a complete CUE instance (package). The
+instance's transitive ``deps`` are supplied automatically through its
+``CUEInstanceInfo`` provider.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Attribute
+     - Description
+   * - ``name``
+     - Target name.
+   * - ``instance`` (required)
+     - The ``cue_instance`` target to export.
+   * - ``srcs``
+     - Optional extra packageless input files to merge alongside the
+       instance during export.
+   * - ``qualified_srcs``
+     - Optional extra inputs whose type should be qualified explicitly.
+
+See ``Common Attributes Reference`` below for shared attrs such as
+``expression``, ``inject``, ``inject_shorthand``,
+``inject_system_variables``, ``concatenate_objects``,
+``merge_other_files``, ``output_package_name``, ``path``,
+``stamping_policy``, ``with_context``, and the exported-family output
+attrs ``output_format``, ``escape``, and ``result``.
+
+cue_consolidated_standalone_files
+---------------------------------
+
+.. code-block:: starlark
+
+   cue_consolidated_standalone_files(
+       name,
+       srcs = [],
+       qualified_srcs = {},
+       # ... + shared output-producing attributes
+   )
+
+Runs ``cue def`` over a bag of packageless files.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Attribute
+     - Description
+   * - ``name``
+     - Target name.
+   * - ``srcs``
+     - Usually the main standalone input files to consolidate. In
+       practice you typically set ``srcs``, ``qualified_srcs``, or
+       both.
+   * - ``qualified_srcs``
+     - Additional standalone input files whose type needs an explicit
+       qualifier instead of relying on the file extension.
+
+See ``Common Attributes Reference`` below for shared attrs such as
+``expression``, ``inject``, ``inject_shorthand``,
+``inject_system_variables``, ``concatenate_objects``,
+``merge_other_files``, ``output_package_name``, ``path``,
+``stamping_policy``, ``with_context``, and the consolidated-family
+output attrs ``output_format``, ``inline_imports``, and ``result``.
+
+cue_consolidated_files
+----------------------
+
+.. code-block:: starlark
+
+   cue_consolidated_files(
+       name,
+       module,              # required: a cue_module target
+       srcs = [],
+       qualified_srcs = {},
+       deps = [],
+       # ... + shared output-producing attributes
+   )
+
+Runs ``cue def`` over files inside a CUE module.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Attribute
+     - Description
+   * - ``name``
+     - Target name.
+   * - ``module`` (required)
+     - The ``cue_module`` target for the containing CUE module.
+   * - ``srcs``
+     - Usually the module-relative CUE files (and any extra packageless
+       inputs) that you want to consolidate.
+   * - ``qualified_srcs``
+     - Additional module-relative inputs whose type should be qualified
+       explicitly instead of inferred from the file extension.
+   * - ``deps``
+     - ``cue_instance`` targets referenced by the files in ``srcs``.
+
+See ``Common Attributes Reference`` below for shared attrs such as
+``expression``, ``inject``, ``inject_shorthand``,
+``inject_system_variables``, ``concatenate_objects``,
+``merge_other_files``, ``output_package_name``, ``path``,
+``stamping_policy``, ``with_context``, and the consolidated-family
+output attrs ``output_format``, ``inline_imports``, and ``result``.
+
+cue_consolidated_instance
+-------------------------
+
+.. code-block:: starlark
+
+   cue_consolidated_instance(
+       name,
+       instance,            # required: a cue_instance target
+       srcs = [],
+       qualified_srcs = {},
+       # ... + shared output-producing attributes
+   )
+
+Runs ``cue def`` over a complete CUE instance.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
+
+   * - Attribute
+     - Description
+   * - ``name``
+     - Target name.
+   * - ``instance`` (required)
+     - The ``cue_instance`` target to consolidate.
+   * - ``srcs``
+     - Optional extra packageless input files to merge alongside the
+       instance during consolidation.
+   * - ``qualified_srcs``
+     - Optional extra inputs whose type should be qualified explicitly.
+
+See ``Common Attributes Reference`` below for shared attrs such as
+``expression``, ``inject``, ``inject_shorthand``,
+``inject_system_variables``, ``concatenate_objects``,
+``merge_other_files``, ``output_package_name``, ``path``,
+``stamping_policy``, ``with_context``, and the consolidated-family
+output attrs ``output_format``, ``inline_imports``, and ``result``.
+
+Common Attributes Reference
+---------------------------
+
+The six output rules above share a large set of attributes. The per-rule
+tables call out the usual inputs for each variant; the tables below
+document the shared attrs once.
 
 Source inputs
 ~~~~~~~~~~~~~
@@ -236,9 +478,9 @@ Source inputs
      - Description
    * - ``srcs``
      - Additional input files that are not part of a CUE package. For
-       ``*_standalone_files`` rules this is typically the entire input
+       ``*_standalone_files`` rules this is typically the primary input
        set; for ``*_files`` and ``*_instance`` rules these are extra
-       "packageless" inputs merged alongside the package.
+       packageless inputs merged alongside the module or instance.
    * - ``qualified_srcs``
      - ``label_keyed_string_dict`` of additional input files whose type
        cannot be guessed from the file extension. Each value is a
@@ -259,8 +501,9 @@ Output shaping and injection
        ``--expression``).
    * - ``inject``
      - ``string_dict`` of ``key=value`` pairs injected into tagged
-       fields (``cue``'s ``--inject``). Values wrapped in ``{…}`` are
-       treated as workspace-status placeholders; see "Stamping" below.
+       fields (``cue``'s ``--inject``). Values wrapped in ``{...}`` are
+       treated as workspace-status placeholders; see ``stamping_policy``
+       below.
    * - ``inject_shorthand``
      - List of shorthand values injected into tagged fields (for CUE
        tags that take no name).
@@ -275,8 +518,8 @@ Output shaping and injection
        to disable (``--merge=false``).
    * - ``output_package_name``
      - Name of the CUE package within which to generate CUE output
-       (``--package``). (``non_cue_file_package_name`` is accepted as a
-       deprecated alias.)
+       (``--package``). ``non_cue_file_package_name`` is accepted as a
+       deprecated alias.
    * - ``path``
      - List of elements of a CUE path at which to place top-level
        values (``--path``). Each element may be a CUE field
@@ -288,14 +531,14 @@ Output shaping and injection
        count (``--with-context``).
    * - ``stamping_policy``
      - One of ``"Allow"`` (default), ``"Force"``, or ``"Prevent"``.
-       Controls whether ``inject`` values wrapped in ``{…}`` are
+       Controls whether ``inject`` values wrapped in ``{...}`` are
        replaced with values from ``stable-status.txt`` /
        ``volatile-status.txt``. ``"Allow"`` stamps only when
        ``bazel build --stamp`` is active; ``"Force"`` stamps
        unconditionally; ``"Prevent"`` disables stamping.
 
-Exported-output attributes (``cue_exported_*``)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Exported-family output attributes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -313,8 +556,8 @@ Exported-output attributes (``cue_exported_*``)
        extension matches ``output_format`` (``json``, ``yaml``,
        ``cue``, or ``txt``).
 
-Consolidated-output attributes (``cue_consolidated_*``)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Consolidated-family output attributes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. list-table::
    :header-rows: 1
@@ -331,93 +574,6 @@ Consolidated-output attributes (``cue_consolidated_*``)
    * - ``result``
      - Output file label. Defaults to ``<name>.<ext>`` where the
        extension matches ``output_format``.
-
-cue_exported_standalone_files
------------------------------
-
-.. code-block:: starlark
-
-   cue_exported_standalone_files(
-       name,
-       srcs,
-       # ... + common output-producing and exported-output attributes
-   )
-
-Runs ``cue export`` over a bag of packageless CUE/JSON/YAML/text files.
-No ``cue_module`` is involved.
-
-cue_exported_files
-------------------
-
-.. code-block:: starlark
-
-   cue_exported_files(
-       name,
-       srcs,
-       module,        # required: a cue_module target
-       deps = [],     # cue_instance targets referenced by srcs
-       # ... + common output-producing and exported-output attributes
-   )
-
-Runs ``cue export`` over files that live inside a CUE module but that
-are not themselves an instance. Use it for top-level CUE files that
-import instances from the same module.
-
-cue_exported_instance
----------------------
-
-.. code-block:: starlark
-
-   cue_exported_instance(
-       name,
-       instance,      # required: a cue_instance target
-       # ... + common output-producing and exported-output attributes
-   )
-
-Runs ``cue export`` over a complete CUE instance (package). The
-instance's transitive ``deps`` are supplied automatically through its
-``CUEInstanceInfo`` provider.
-
-cue_consolidated_standalone_files
----------------------------------
-
-.. code-block:: starlark
-
-   cue_consolidated_standalone_files(
-       name,
-       srcs,
-       # ... + common output-producing and consolidated-output attributes
-   )
-
-Runs ``cue def`` over a bag of packageless files.
-
-cue_consolidated_files
-----------------------
-
-.. code-block:: starlark
-
-   cue_consolidated_files(
-       name,
-       srcs,
-       module,        # required: a cue_module target
-       deps = [],
-       # ... + common output-producing and consolidated-output attributes
-   )
-
-Runs ``cue def`` over files inside a CUE module.
-
-cue_consolidated_instance
--------------------------
-
-.. code-block:: starlark
-
-   cue_consolidated_instance(
-       name,
-       instance,      # required: a cue_instance target
-       # ... + common output-producing and consolidated-output attributes
-   )
-
-Runs ``cue def`` over a complete CUE instance.
 
 -----
 

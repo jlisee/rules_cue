@@ -424,30 +424,11 @@ Runs ``cue def`` over a complete CUE instance.
 Forcing evaluation to validate CUE files
 ========================================
 
-Because every ``cue_exported_*`` and ``cue_consolidated_*`` target
-invokes the ``cue`` tool during its build action, simply *building*
-those targets is enough to run the CUE evaluator end to end. Any
-constraint violation, unresolved reference, or schema mismatch in the
-evaluated configuration fails the action, and the CUE tool's diagnostic
-is reported on stderr.
-
-There is no separate ``cue_vet`` rule: the existing rules already
-perform full evaluation.
-
-Validate an entire workspace with::
-
-   bazel build //...
-
-To validate a particular target::
-
-   bazel build //path/to:my_cue_exported_files
-
-For example, this repository's own examples and test data can be
-exercised with::
-
-   bazel build //examples/bzlmod/root:root          # cue_exported_standalone_files
-   bazel build //test/testdata/hello_world:hello_world   # cue_exported_files
-   bazel build //test/testdata/consolidated/...          # cue_consolidated_*
+``cue_instance`` and ``cue_module`` files do not evaluate the contents of
+CUE the files.  To ensure your cue are correct and produce consistent
+output you need to use the rules in either a ``cue_exported_*`` or
+``cue_consolidated_*`` target. One you do that a ``bazel build`` of the
+those rules will validate the CUE files.
 
 When the CUE evaluator rejects the input, Bazel's output looks roughly
 like::

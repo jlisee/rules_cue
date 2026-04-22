@@ -151,7 +151,7 @@ Rule Reference
 Rule signatures below use Starlark keyword syntax. Each documented rule
 has its own table. For the six output-producing rules, the per-rule
 tables focus on the usual inputs for that variant; shared attributes are
-documented once in ``Common Attributes Reference`` below.
+documented once in `Common Attributes Reference`_ below.
 
 cue_module
 ----------
@@ -252,7 +252,7 @@ No ``cue_module`` is involved.
      - Additional standalone input files whose type needs an explicit
        qualifier instead of relying on the file extension.
 
-See ``Common Attributes Reference`` below for shared attrs such as
+See `Common Attributes Reference`_ below for shared attrs such as
 ``expression``, ``inject``, ``inject_shorthand``,
 ``inject_system_variables``, ``concatenate_objects``,
 ``merge_other_files``, ``output_package_name``, ``path``,
@@ -296,7 +296,7 @@ import instances from the same module.
    * - ``deps``
      - ``cue_instance`` targets referenced by the files in ``srcs``.
 
-See ``Common Attributes Reference`` below for shared attrs such as
+See `Common Attributes Reference`_ below for shared attrs such as
 ``expression``, ``inject``, ``inject_shorthand``,
 ``inject_system_variables``, ``concatenate_objects``,
 ``merge_other_files``, ``output_package_name``, ``path``,
@@ -336,7 +336,7 @@ instance's transitive ``deps`` are supplied automatically through its
    * - ``qualified_srcs``
      - Optional extra inputs whose type should be qualified explicitly.
 
-See ``Common Attributes Reference`` below for shared attrs such as
+See `Common Attributes Reference`_ below for shared attrs such as
 ``expression``, ``inject``, ``inject_shorthand``,
 ``inject_system_variables``, ``concatenate_objects``,
 ``merge_other_files``, ``output_package_name``, ``path``,
@@ -373,7 +373,7 @@ Runs ``cue def`` over a bag of packageless files.
      - Additional standalone input files whose type needs an explicit
        qualifier instead of relying on the file extension.
 
-See ``Common Attributes Reference`` below for shared attrs such as
+See `Common Attributes Reference`_ below for shared attrs such as
 ``expression``, ``inject``, ``inject_shorthand``,
 ``inject_system_variables``, ``concatenate_objects``,
 ``merge_other_files``, ``output_package_name``, ``path``,
@@ -415,7 +415,7 @@ Runs ``cue def`` over files inside a CUE module.
    * - ``deps``
      - ``cue_instance`` targets referenced by the files in ``srcs``.
 
-See ``Common Attributes Reference`` below for shared attrs such as
+See `Common Attributes Reference`_ below for shared attrs such as
 ``expression``, ``inject``, ``inject_shorthand``,
 ``inject_system_variables``, ``concatenate_objects``,
 ``merge_other_files``, ``output_package_name``, ``path``,
@@ -453,7 +453,7 @@ Runs ``cue def`` over a complete CUE instance.
    * - ``qualified_srcs``
      - Optional extra inputs whose type should be qualified explicitly.
 
-See ``Common Attributes Reference`` below for shared attrs such as
+See `Common Attributes Reference`_ below for shared attrs such as
 ``expression``, ``inject``, ``inject_shorthand``,
 ``inject_system_variables``, ``concatenate_objects``,
 ``merge_other_files``, ``output_package_name``, ``path``,
